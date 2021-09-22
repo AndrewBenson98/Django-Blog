@@ -52,12 +52,19 @@
     <h2>Comments</h2>
 
     {% for comment in object.comments.all %}
+
+    {% if comment.approved_comment or user.is_superuser %}
     <div class="comment">
         <strong><a class="mr-1" href="{% url 'user-posts' comment.author.username %}">{{ comment.author }}</a></strong>
         <small class="text-muted ml-1"> {{ comment.date_posted }}</small>
+        {% if not comment.approved_comment %}
+        <a class="btn btn-outline-danger ml-3" href="{% url 'comment-delete' pk=object.id cpk=comment.id %}">Delete</a>
+        <a class="btn btn-outline-info ml-3" href="{% url 'comment-approve' pk=object.id cpk=comment.id %}">Approve</a>
+        {% endif %}
+
         <p>{{ comment.content|linebreaks }}</p>
     </div>
-    <br>
+    {% endif %}
     {% empty %}
     <p>No Comments Here Yet</p>
 

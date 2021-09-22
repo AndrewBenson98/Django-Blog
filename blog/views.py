@@ -77,6 +77,18 @@ class CommentFormView(LoginRequiredMixin,CreateView):
         form.save()
         return super().form_valid(form)
     
+    def comment_approve(request, pk, cpk):
+        comment = get_object_or_404(Comment, pk=cpk)
+        comment.approve()
+        return redirect('post-detail', pk=comment.post.pk)
+
+    def comment_delete(request,pk, cpk):
+        comment = get_object_or_404(Comment, pk=cpk)
+        comment.delete()
+        return redirect('post-detail', pk=comment.post.pk)
+    
+    
+    
 #Combination of Post Detail view and Comment Create view
 class PostView(View):
     def get(self, request, *args, **kwargs):
@@ -140,4 +152,5 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'blog/about.html', {'title':'About'})
+
 
