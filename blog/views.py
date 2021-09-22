@@ -1,12 +1,17 @@
 
+from django.forms.forms import Form
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post
+from .models import Post, Comment
 from django.views.generic import (ListView, DeleteView, CreateView, DetailView, UpdateView)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.utils import timezone
-
-
+from blog.forms import CommentForm
+from django.views.generic import FormView
+from django.views.generic.detail import SingleObjectMixin
+from django.views import View
+from django.http import HttpResponseForbidden
+from django.urls import reverse, reverse_lazy
 # Create your views here.
 # def home(request):
 #     posts = Post.objects.all()
@@ -20,7 +25,7 @@ class PostListView(ListView):
 
     def get_queryset(self):
         #Get username from url 
-        return Post.objects.filter(date_published__isnull=False).order_by('date_published')
+        return Post.objects.filter(date_published__isnull=False).order_by('-date_published')
 
 class UserPostListView(ListView):
     model = Post
@@ -31,7 +36,7 @@ class UserPostListView(ListView):
     def get_queryset(self):
         #Get username from url 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user,date_published__isnull=False).order_by('date_published')
+        return Post.objects.filter(author=user,date_published__isnull=False).order_by('-date_published')
 
 class UserDraftListView(ListView):
     model = Post
@@ -42,11 +47,46 @@ class UserDraftListView(ListView):
     def get_queryset(self):
         #Get username from url 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user, date_published__isnull=True).order_by('date_posted')
+        return Post.objects.filter(author=user, date_published__isnull=True).order_by('-date_posted')
+
 
 class PostDetailView(DetailView):
     model = Post
-    #template_name = 'blog/post_detail.html'
+    template_name = 'blog/post_detail.html'
+
+
+    def get_context_data(self, **kwargs):
+        #Adding a form context to the view
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        return context
+
+class CommentFormView(LoginRequiredMixin,CreateView):
+    template_name = 'blog/post_detail.html'
+    # form_class = CommentForm
+    model = Comment
+    fields = ['content']
+
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
+    
+    #Set the author to logged in user when comment is made
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post =Post.objects.get(pk =self.kwargs.get('pk'))
+        form.save()
+        return super().form_valid(form)
+    
+#Combination of Post Detail view and Comment Create view
+class PostView(View):
+    def get(self, request, *args, **kwargs):
+        view = PostDetailView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = CommentFormView.as_view()
+        return view(request, *args, **kwargs)
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

@@ -12,7 +12,9 @@
         </div>
         <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
         <p class="article-content">{{ post.content|slice:"0:150" }}...</p>
+        <small>Comments: {{ post.comments.count }}</small>
     </div>
+
 </article>
 {% endfor %}
 
