@@ -2,5 +2,21 @@
 
 {% block content %}
 <h1>About</h1>
+<pre>
+Thank you for checking out my blog application!
 
+This Django App was made by following a YouTube tutorial by <a href="https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p&ab_channel=CoreySchafer">Corey Schafer</a>.
+
+This is a simple blog application that lets users register, login/logout and write blog posts.
+
+Users can also update their profile pictures and email adresses. Images are stored using 
+the AWS S3 service.
+
+If users forget their password, there is a reset password feature that will send you an 
+email to reset your password.
+
+By clicking on a user, you can see all the blog posts that user has written.
+Posts can also be deleted and edited but only by the author of the post.
+
+</pre>
 {% endblock %}
