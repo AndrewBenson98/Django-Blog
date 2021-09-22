@@ -47,16 +47,19 @@ class PostApprovalListView(LoginRequiredMixin, UserPassesTestMixin,ListView):
     def approve_post(request,pk):
         post = get_object_or_404(Post, pk=pk)
         post.approve()
+        messages.success(request, f'Post has been approved')
         return redirect('post-approval-list')
 
     def comment_approve(request, pk, cpk):
         comment = get_object_or_404(Comment, pk=cpk)
         comment.approve()
+        messages.success(request, f'Comment has been approved')
         return redirect('post-detail', pk=comment.post.pk)
 
     def comment_delete(request,pk, cpk):
         comment = get_object_or_404(Comment, pk=cpk)
         comment.delete()
+        messages.success(request, f'Comment has been deleted')
         return redirect('post-detail', pk=comment.post.pk)
 
 class UserPostListView(ListView):
@@ -162,13 +165,14 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin,UpdateView):
         post = get_object_or_404(Post, pk=pk)
         post.date_published = timezone.now()
         post.save()
+        messages.info(request, f'Post has been published! A moderator must approve it before displaying on the site.')
         return redirect('post-detail', pk=pk)
 
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = '/'
-    #template_name = 'blog/post_detail.html'
+    #template_name = 'blog/post_confirm_delete.html'
 
     def test_func(self):
         post = self.get_object() #Gets the post we are currently trying to update
