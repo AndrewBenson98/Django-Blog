@@ -83,8 +83,10 @@
                         <a href="{% url 'user-posts' request.user.username %}">
                             <li class="list-group-item list-group-item-light">My Posts</li>
                         </a>
-                        <li class="list-group-item list-group-item-light">Tags</li>
-                        <li class="list-group-item list-group-item-light">etc</li>
+                        <a href="{% url 'user-drafts' request.user.username %}">
+                            <li class="list-group-item list-group-item-light">My Drafts</li>
+                        </a>
+
                     </ul>
                     {% else %}
 

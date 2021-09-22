@@ -1,8 +1,10 @@
+from io import BytesIO
 from django.db import models
-
+from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
 from PIL import Image
+from users.utils import image_resize
 
 # Create your models here.
 class Profile(models.Model):
@@ -21,4 +23,7 @@ class Profile(models.Model):
     #         output_size = (300,300)
     #         img.thumbnail(output_size)
     #         img.save(self.image.path)
-        
+    
+    def save(self, *args, **kwargs):
+        image_resize(self.image, 300, 300)
+        super().save(*args, **kwargs)
