@@ -7,7 +7,9 @@
             <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ object.author }}</a>
 
             {% if not object.date_published %}
-            <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+            <small class="text-muted">Click 'Publish' to finish your post!</small>
+            {% else %}
+            <small class="text-muted">{{ object.date_published|date:"F d, Y" }}</small>
             {% endif %}
 
             {% if object.author == user %}

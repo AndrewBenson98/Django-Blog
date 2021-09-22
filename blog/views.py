@@ -20,7 +20,7 @@ class PostListView(ListView):
 
     def get_queryset(self):
         #Get username from url 
-        return Post.objects.filter(date_published__isnull=False).order_by('-date_published')
+        return Post.objects.filter(date_published__isnull=False).order_by('date_published')
 
 class UserPostListView(ListView):
     model = Post
@@ -31,7 +31,7 @@ class UserPostListView(ListView):
     def get_queryset(self):
         #Get username from url 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user,date_published__isnull=False).order_by('-date_published')
+        return Post.objects.filter(author=user,date_published__isnull=False).order_by('date_published')
 
 class UserDraftListView(ListView):
     model = Post
@@ -42,7 +42,7 @@ class UserDraftListView(ListView):
     def get_queryset(self):
         #Get username from url 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user, date_published__isnull=True).order_by('-date_posted')
+        return Post.objects.filter(author=user, date_published__isnull=True).order_by('date_posted')
 
 class PostDetailView(DetailView):
     model = Post
