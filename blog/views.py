@@ -12,6 +12,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views import View
 from django.http import HttpResponseForbidden
 from django.urls import reverse, reverse_lazy
+from django.contrib import messages
 # Create your views here.
 # def home(request):
 #     posts = Post.objects.all()
@@ -43,6 +44,21 @@ class PostApprovalListView(LoginRequiredMixin, UserPassesTestMixin,ListView):
             return True
         return False
 
+    def approve_post(request,pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.approve()
+        return redirect('post-approval-list')
+
+    def comment_approve(request, pk, cpk):
+        comment = get_object_or_404(Comment, pk=cpk)
+        comment.approve()
+        return redirect('post-detail', pk=comment.post.pk)
+
+    def comment_delete(request,pk, cpk):
+        comment = get_object_or_404(Comment, pk=cpk)
+        comment.delete()
+        return redirect('post-detail', pk=comment.post.pk)
+
 class UserPostListView(ListView):
     model = Post
     template_name = 'blog/user_posts.html'
@@ -52,7 +68,7 @@ class UserPostListView(ListView):
     def get_queryset(self):
         #Get username from url 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user,date_published__isnull=False).order_by('-date_published')
+        return Post.objects.filter(author=user,approved_post=True,date_published__isnull=False).order_by('-date_published')
 
 class UserDraftListView(ListView):
     model = Post
@@ -75,12 +91,10 @@ class PostDetailView(DetailView):
         #Adding a form context to the view
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
+        
         return context
     
-    def approve_post(request,pk):
-        post = get_object_or_404(Post, pk=pk)
-        post.approve()
-        return redirect('post-approval-list')
+
     
 
 class CommentFormView(LoginRequiredMixin,CreateView):
@@ -99,15 +113,7 @@ class CommentFormView(LoginRequiredMixin,CreateView):
         form.save()
         return super().form_valid(form)
     
-    def comment_approve(request, pk, cpk):
-        comment = get_object_or_404(Comment, pk=cpk)
-        comment.approve()
-        return redirect('post-detail', pk=comment.post.pk)
 
-    def comment_delete(request,pk, cpk):
-        comment = get_object_or_404(Comment, pk=cpk)
-        comment.delete()
-        return redirect('post-detail', pk=comment.post.pk)
     
     
     
