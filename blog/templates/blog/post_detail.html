@@ -1,6 +1,8 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
+
+
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt="">
     <div class="media-body">
@@ -13,7 +15,7 @@
             <small class="text-muted">{{ object.date_published|date:"F d, Y" }}</small>
             {% endif %}
 
-            {% if object.author == user %}
+            {% if object.author == user or user.is_superuser %}
             <div>
                 <a class='btn btn-secondary btn-sm mt-1 mb-1' href="{% url 'post-update' object.id  %}">Update</a>
 
@@ -22,6 +24,10 @@
                 {% endif %}
 
                 <a class='btn btn-danger btn-sm mt-1 mb-1' href="{% url 'post-delete' object.id  %}">Delete</a>
+
+                {% if not post.approved_post and user.is_superuser %}
+                <a class="btn btn-info btn-sm ml-3" href="{% url 'post-approve' post.pk %}">Approve</a>
+                {% endif %}
             </div>
             {% endif %}
         </div>
@@ -29,6 +35,7 @@
         <p class="article-content">{{ object.content }}</p>
     </div>
 </article>
+
 
 <hr>
 
@@ -46,6 +53,7 @@
     </form>
 </div>
 {% endif %}
+
 
 
 <div class="content-section">
@@ -69,7 +77,7 @@
     <p>No Comments Here Yet</p>
 
     {% endfor %}
-
 </div>
+
 
 {% endblock %}

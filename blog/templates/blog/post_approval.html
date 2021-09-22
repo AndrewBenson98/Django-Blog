@@ -2,18 +2,20 @@
 
 {% block content %}
 <!-- Posts -->
+<h1>Moderator Page: Approvals</h1>
 {% for post in posts %}
 
-{% if post.approved_post or user.is_superuser %}
+{% if user.is_superuser %}
 <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt="">
     <div class="media-body">
         <div class="article-metadata">
             <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
             <small class="text-muted">{{ post.date_published|date:"F d, Y" }}</small>
+            {% if not post.approved_post and user.is_superuser %}
+            <a class="btn btn-info btn-sm ml-3" href="{% url 'post-approve' post.pk %}">Approve</a>
+            {% endif %}
         </div>
-
-
         <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
         <p class="article-content">{{ post.content|slice:"0:150" }}...</p>
         <small>Comments: {{ post.comments.count }}</small>

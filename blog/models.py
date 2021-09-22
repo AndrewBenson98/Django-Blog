@@ -12,10 +12,14 @@ class Post(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=CASCADE)
     date_published = models.DateField(blank=True, null=True)
-    
+    approved_post =  models.BooleanField(default=False)
     
     def __str__(self):
         return self.title
+    
+    def approve(self):
+        self.approved_post = True
+        self.save()
     
     #Works with class create view to redirect after post is created
     def get_absolute_url(self):

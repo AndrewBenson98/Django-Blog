@@ -25,7 +25,23 @@ class PostListView(ListView):
 
     def get_queryset(self):
         #Get username from url 
-        return Post.objects.filter(date_published__isnull=False).order_by('-date_published')
+        return Post.objects.filter(approved_post=True ,date_published__isnull=False).order_by('-date_published')
+
+class PostApprovalListView(LoginRequiredMixin, UserPassesTestMixin,ListView):
+    model = Post
+    template_name = 'blog/post_approval.html'
+    context_object_name ='posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        #Get username from url 
+        return Post.objects.filter(approved_post=False ,date_published__isnull=False).order_by('-date_published')
+
+    def test_func(self):
+        #Check if current user is the post author
+        if  self.request.user.is_superuser:
+            return True
+        return False
 
 class UserPostListView(ListView):
     model = Post
@@ -60,6 +76,12 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         return context
+    
+    def approve_post(request,pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.approve()
+        return redirect('post-approval-list')
+    
 
 class CommentFormView(LoginRequiredMixin,CreateView):
     template_name = 'blog/post_detail.html'
@@ -146,7 +168,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object() #Gets the post we are currently trying to update
         
         #Check if current user is the post author
-        if self.request.user == post.author:
+        if self.request.user == post.author or self.request.user.is_superuser:
             return True
         return False
 
