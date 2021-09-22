@@ -1,5 +1,5 @@
 -Comments number in home page show number of all comments, not just number of approved comments
 
--User can update a post without getting it approved again. When updating, change approved_post to False
+-User can update a post without getting it approved again. When updating, change approved_post to False --DONE
 
--Tell user to log in before they can comment
+-Tell user to log in before they can comment --DONE

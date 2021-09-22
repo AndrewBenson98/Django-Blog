@@ -150,13 +150,15 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin,UpdateView):
     #Set the author to logged in user when post is made
     def form_valid(self, form):
         form.instance.author = self.request.user
+        form.instance.approved_post = False
+        messages.info(self.request, f'Post has been Updated! A moderator must approve it before displaying on the site.')
         return super().form_valid(form)
     
     def test_func(self):
         post = self.get_object() #Gets the post we are currently trying to update
         
         #Check if current user is the post author
-        if self.request.user == post.author:
+        if self.request.user == post.author or self.request.user.is_superuser:
             return True
         return False
 

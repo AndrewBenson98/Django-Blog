@@ -52,6 +52,11 @@
         </div>
     </form>
 </div>
+{% else %}
+<div class="content-section">
+    <p><a class="nav-item nav-link" href="{% url 'login' %}">Login to post a comment!</a></p>
+</div>
+
 {% endif %}
 
 
